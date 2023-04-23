@@ -3,14 +3,16 @@ package telegram
 import (
 	"github.com/go-telegram-bot-api/telegram-bot-api"
 	"log"
+	"github.com/zhashkevych/go-pocket-sdk"
 )
 
 type Bot struct {
 	bot *tgbotapi.BotAPI
+	pocketClient *pocket.Client
 }
 
-func NewBot(bot *tgbotapi.BotAPI) *Bot {
-	return &Bot{bot}
+func NewBot(bot *tgbotapi.BotAPI, pocketClient *pocket.Client) *Bot {
+	return &Bot{bot: bot, pocketClient: pocketClient}
 }
 
 func (b *Bot) Start() error {
@@ -22,23 +24,26 @@ func (b *Bot) Start() error {
 		return  err
 	}
 
-	b.hundleUpdate(updates)
+	b.handleUpdates(updates)
 	return nil
 }
 
-func (b *Bot) hundleUpdate(updates tgbotapi.UpdatesChannel) {
+func (b *Bot) handleUpdates(updates tgbotapi.UpdatesChannel) {
 	for update := range updates {
-		if update.Message != nil { // If we got a message
-			log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
-
-			msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
-			//msg.ReplyToMessageID = update.Message.MessageID
-
-			b.bot.Send(msg)
+		if update.Message == nil { // If we got a message
+			continue
 		}
-	}
 
+		if update.Message.IsCommand() {
+			b.handleCommand(update.Message)
+			continue
+		}
+
+		b.handleMessage(update.Message)
+	}
 }
+
+
 
 func (b *Bot) initUpdatesChannel() (tgbotapi.UpdatesChannel, error) {
 	u := tgbotapi.NewUpdate(0)
