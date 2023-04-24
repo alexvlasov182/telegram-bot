@@ -1,13 +1,14 @@
 package telegram
 
 import (
-	"github.com/go-telegram-bot-api/telegram-bot-api"
 	"log"
+
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
 const (
 	commandStart = "start"
-	replyStart = "access is required for authentication:\n%s"
+	replyStart   = "access is required for authentication:\n%s"
 )
 
 func (b *Bot) handleCommand(message *tgbotapi.Message) error {
@@ -32,4 +33,3 @@ func (b *Bot) handleMessage(message *tgbotapi.Message) {
 	b.bot.Send(msg)
 
 }
-
