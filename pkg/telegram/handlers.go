@@ -21,6 +21,7 @@ func (b *Bot) handleCommand(message *tgbotapi.Message) error {
 		return err
 	default:
 		_, err := b.bot.Send(msg)
+		// small messages for test
 		return err
 	}
 }
