@@ -1,9 +1,10 @@
 package main
 
 import (
-	"github.com/go-telegram-bot-api/telegram-bot-api"
 	"log"
+
 	"github.com/alexvlasov182/telegram-bot/pkg/telegram"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/zhashkevych/go-pocket-sdk"
 )
 
@@ -20,10 +21,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-
 	telegramBot := telegram.NewBot(bot, pocketClient)
 	if err := telegramBot.Start(); err != nil {
 		log.Fatal(err)
 	}
-
 }
