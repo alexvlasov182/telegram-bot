@@ -1,19 +1,20 @@
 package telegram
 
 import (
-	"fmt"
-	"log"
+	"context"
+	"net/url"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	"github.com/zhashkevych/go-pocket-sdk"
 )
 
 const (
-	commandStart       = "start"
-	replyStartTemplate = "access is required for authentication:\n%s"
+	commandStart           = "start"
+	replyStartTemplate     = "access is required for authentication:\n%s"
+	replyAlreadyAuthorized = "You are authorizat now, send me link and I save this link for you"
 )
 
 func (b *Bot) handleCommand(message *tgbotapi.Message) error {
-
 	switch message.Command() {
 	case commandStart:
 		return b.handleStartCommand(message)
@@ -22,22 +23,43 @@ func (b *Bot) handleCommand(message *tgbotapi.Message) error {
 	}
 }
 
-func (b *Bot) handleMessage(message *tgbotapi.Message) {
+func (b *Bot) handleMessage(message *tgbotapi.Message) error {
+	msg := tgbotapi.NewMessage(message.Chat.ID, "Link successfully saved")
 
-	log.Printf("[%s] %s", message.From.UserName, message.Text)
+	_, err := url.ParseRequestURI(message.Text)
+	if err != nil {
+		msg.Text = "This is not valid link"
+		_, err = b.bot.Send(msg)
+		return err
+	}
 
-	msg := tgbotapi.NewMessage(message.Chat.ID, message.Text)
-	b.bot.Send(msg)
+	accessToken, err := b.getAccessToken(message.Chat.ID)
+	if err != nil {
+		msg.Text = "You are not authoraizet, use command start"
+		_, err = b.bot.Send(msg)
+		return err
+	}
 
+	if err := b.pocketClient.Add(context.Background(), pocket.AddInput{
+		AccessToken: accessToken,
+		URL:         message.Text,
+	}); err != nil {
+		msg.Text = "Sorry something wrong, try letter"
+		_, err = b.bot.Send(msg)
+		return err
+	}
+
+	_, err = b.bot.Send(msg)
+	return err
 }
 
 func (b *Bot) handleStartCommand(message *tgbotapi.Message) error {
-	authLink, err := b.generateAuthorizationLink(message.Chat.ID)
+	_, err := b.getAccessToken(message.Chat.ID)
 	if err != nil {
-		return err
+		return b.initAuthorizationProcess(message)
 	}
-	msg := tgbotapi.NewMessage(message.Chat.ID, fmt.Sprintf(replyStartTemplate, authLink))
 
+	msg := tgbotapi.NewMessage(message.Chat.ID, replyAlreadyAuthorized)
 	_, err = b.bot.Send(msg)
 	return err
 }

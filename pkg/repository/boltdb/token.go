@@ -1,37 +1,42 @@
+// Package boltdb ...
 package boltdb
 
 import (
 	"errors"
 	"strconv"
 
-	"github.com/alexvlasov182/telegram-bot/pkg/repository"
 	"github.com/boltdb/bolt"
+
+	"github.com/alexvlasov182/telegram-bot/pkg/repository"
 )
 
+// TokenRepository repository ...
 type TokenRepository struct {
 	db *bolt.DB
 }
 
+// NewTokenRepository function ...
 func NewTokenRepository(db *bolt.DB) *TokenRepository {
 	return &TokenRepository{db: db}
 }
 
-func (r *TokenRepository) Save(chatId int64, token string, bucket repository.Bucket) error {
+// Save ...
+func (r *TokenRepository) Save(chatID int64, token string, bucket repository.Bucket) error {
 	return r.db.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(bucket))
-		return b.Put(intToBytes(chatId), []byte(token))
+		return b.Put(intToBytes(chatID), []byte(token))
 	})
 }
 
-func (r *TokenRepository) Get(chatId int64, bucket repository.Bucket) (string, error) {
+// Get ...
+func (r *TokenRepository) Get(chatID int64, bucket repository.Bucket) (string, error) {
 	var token string
 	err := r.db.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(bucket))
-		data := b.Get(intToBytes(chatId))
+		data := b.Get(intToBytes(chatID))
 		token = string(data)
 		return nil
 	})
-
 	if err != nil {
 		return "", err
 	}
