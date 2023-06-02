@@ -1,13 +1,16 @@
+// Package telegram ...
 package telegram
 
 import (
 	"log"
 
-	"github.com/alexvlasov182/telegram-bot/pkg/repository"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/zhashkevych/go-pocket-sdk"
+
+	"github.com/alexvlasov182/telegram-bot/pkg/repository"
 )
 
+// Bot function
 type Bot struct {
 	bot             *tgbotapi.BotAPI
 	pocketClient    *pocket.Client
@@ -15,10 +18,17 @@ type Bot struct {
 	redirectURL     string
 }
 
-func NewBot(bot *tgbotapi.BotAPI, pocketClient *pocket.Client, tr repository.TokenRepository, redirectURL string) *Bot {
+// NewBot function
+func NewBot(
+	bot *tgbotapi.BotAPI,
+	pocketClient *pocket.Client,
+	tr repository.TokenRepository,
+	redirectURL string,
+) *Bot {
 	return &Bot{bot: bot, pocketClient: pocketClient, redirectURL: redirectURL, tokenRepository: tr}
 }
 
+// Start function
 func (b *Bot) Start() error {
 	log.Printf("Authorized on account %s", b.bot.Self.UserName)
 
@@ -38,11 +48,15 @@ func (b *Bot) handleUpdates(updates tgbotapi.UpdatesChannel) {
 		}
 
 		if update.Message.IsCommand() {
-			b.handleCommand(update.Message)
+			if err := b.handleCommand(update.Message); err != nil {
+				b.handleError(update.Message.Chat.ID, err)
+			}
 			continue
 		}
 
-		b.handleMessage(update.Message)
+		if err := b.handleMessage(update.Message); err != nil {
+			b.handleError(update.Message.Chat.ID, err)
+		}
 	}
 }
 
