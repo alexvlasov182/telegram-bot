@@ -8,6 +8,7 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/zhashkevych/go-pocket-sdk"
 
+	"github.com/alexvlasov182/telegram-bot/pkg/config"
 	"github.com/alexvlasov182/telegram-bot/pkg/repository"
 	"github.com/alexvlasov182/telegram-bot/pkg/repository/boltdb"
 	"github.com/alexvlasov182/telegram-bot/pkg/server"
@@ -15,6 +16,13 @@ import (
 )
 
 func main() {
+	cfg, err := config.Init()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Println(cfg)
+
 	bot, err := tgbotapi.NewBotAPI("6149137591:AAGIyIRDeaL3HfHmmKOhUpMF0dW8QmqXkxQ")
 	if err != nil {
 		log.Fatal(err)
