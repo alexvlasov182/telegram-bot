@@ -13,21 +13,18 @@ var (
 	errUnableToSave = errors.New("unable to save")
 )
 
-// msg.Text = "You are not authorized! Use command /start"
-// msg.Text = "This is hot valid link!"
-// msg.Text = "Sorry something wrong, try letter"
 func (b *Bot) handleError(chatID int64, err error) {
-	msg := tgbotapi.NewMessage(chatID, "unknown error happend")
+	msg := tgbotapi.NewMessage(chatID, b.messages.Default)
 
 	switch err {
 	case errInvalidURL:
-		msg.Text = "This is not valid link!"
+		msg.Text = b.messages.InvalidURL
 		b.bot.Send(msg)
 	case errUnauthorized:
-		msg.Text = "You are not authorized! Use command /start"
+		msg.Text = b.messages.Unauthorized
 		b.bot.Send(msg)
 	case errUnableToSave:
-		msg.Text = "Sorry something wrong, try letter"
+		msg.Text = b.messages.UnableToSave
 		b.bot.Send(msg)
 	default:
 		b.bot.Send(msg)

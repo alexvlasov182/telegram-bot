@@ -10,9 +10,7 @@ import (
 )
 
 const (
-	commandStart           = "start"
-	replyStartTemplate     = "access is required for authentication:\n%s"
-	replyAlreadyAuthorized = "You are authorizat now, send me link and I save this link for you"
+	commandStart = "start"
 )
 
 func (b *Bot) handleCommand(message *tgbotapi.Message) error {
@@ -42,7 +40,7 @@ func (b *Bot) handleMessage(message *tgbotapi.Message) error {
 		return errUnableToSave
 	}
 
-	msg := tgbotapi.NewMessage(message.Chat.ID, "Link successfully saved")
+	msg := tgbotapi.NewMessage(message.Chat.ID, b.messages.SavedSuccessfully)
 	_, err = b.bot.Send(msg)
 	return err
 }
@@ -53,13 +51,13 @@ func (b *Bot) handleStartCommand(message *tgbotapi.Message) error {
 		return b.initAuthorizationProcess(message)
 	}
 
-	msg := tgbotapi.NewMessage(message.Chat.ID, replyAlreadyAuthorized)
+	msg := tgbotapi.NewMessage(message.Chat.ID, b.messages.AlreadyAuthorized)
 	_, err = b.bot.Send(msg)
 	return err
 }
 
 func (b *Bot) handleUnknownCommand(message *tgbotapi.Message) error {
-	msg := tgbotapi.NewMessage(message.Chat.ID, "I don't know this command")
+	msg := tgbotapi.NewMessage(message.Chat.ID, b.messages.UnknownCommand)
 
 	_, err := b.bot.Send(msg)
 	return err
