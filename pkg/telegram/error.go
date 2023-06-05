@@ -8,25 +8,22 @@ import (
 )
 
 var (
-	errInvalidURL   = errors.New("url is invalid")
-	errUnauthorized = errors.New("user is not authorized")
-	errUnableToSave = errors.New("unable to save")
+	invalidUrlError   = errors.New("url is invalid")
+	unableToSaveError = errors.New("unable to save link to Pocket")
 )
 
 func (b *Bot) handleError(chatID int64, err error) {
-	msg := tgbotapi.NewMessage(chatID, b.messages.Default)
+	var messageText string
 
 	switch err {
-	case errInvalidURL:
-		msg.Text = b.messages.InvalidURL
-		b.bot.Send(msg)
-	case errUnauthorized:
-		msg.Text = b.messages.Unauthorized
-		b.bot.Send(msg)
-	case errUnableToSave:
-		msg.Text = b.messages.UnableToSave
-		b.bot.Send(msg)
+	case invalidUrlError:
+		messageText = b.messages.Errors.InvalidURL
+	case unableToSaveError:
+		messageText = b.messages.Errors.UnableToSave
 	default:
-		b.bot.Send(msg)
+		messageText = b.messages.Errors.Default
 	}
+
+	msg := tgbotapi.NewMessage(chatID, messageText)
+	b.bot.Send(msg)
 }

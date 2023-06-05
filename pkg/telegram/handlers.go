@@ -22,43 +22,54 @@ func (b *Bot) handleCommand(message *tgbotapi.Message) error {
 	}
 }
 
-func (b *Bot) handleMessage(message *tgbotapi.Message) error {
-	_, err := url.ParseRequestURI(message.Text)
-	if err != nil {
-		return errInvalidURL
-	}
-
-	accessToken, err := b.getAccessToken(message.Chat.ID)
-	if err != nil {
-		return errUnauthorized
-	}
-
-	if err := b.pocketClient.Add(context.Background(), pocket.AddInput{
-		AccessToken: accessToken,
-		URL:         message.Text,
-	}); err != nil {
-		return errUnableToSave
-	}
-
-	msg := tgbotapi.NewMessage(message.Chat.ID, b.messages.SavedSuccessfully)
-	_, err = b.bot.Send(msg)
-	return err
-}
-
 func (b *Bot) handleStartCommand(message *tgbotapi.Message) error {
 	_, err := b.getAccessToken(message.Chat.ID)
 	if err != nil {
 		return b.initAuthorizationProcess(message)
 	}
 
-	msg := tgbotapi.NewMessage(message.Chat.ID, b.messages.AlreadyAuthorized)
+	msg := tgbotapi.NewMessage(message.Chat.ID, b.messages.Responses.AlreadyAuthorized)
 	_, err = b.bot.Send(msg)
 	return err
 }
 
 func (b *Bot) handleUnknownCommand(message *tgbotapi.Message) error {
-	msg := tgbotapi.NewMessage(message.Chat.ID, b.messages.UnknownCommand)
-
+	msg := tgbotapi.NewMessage(message.Chat.ID, b.messages.Responses.UnknownCommand)
 	_, err := b.bot.Send(msg)
+	return err
+}
+
+func (b *Bot) handleMessage(message *tgbotapi.Message) error {
+	accessToken, err := b.getAccessToken(message.Chat.ID)
+	if err != nil {
+		return b.initAuthorizationProcess(message)
+	}
+
+	if err := b.saveLink(message, accessToken); err != nil {
+		return err
+	}
+
+	msg := tgbotapi.NewMessage(message.Chat.ID, b.messages.Responses.LinkSaved)
+	_, err = b.bot.Send(msg)
+	return err
+}
+
+func (b *Bot) saveLink(message *tgbotapi.Message, accessToken string) error {
+	if err := b.validateURL(message.Text); err != nil {
+		return invalidUrlError
+	}
+
+	if err := b.client.Add(context.Background(), pocket.AddInput{
+		URL:         message.Text,
+		AccessToken: accessToken,
+	}); err != nil {
+		return unableToSaveError
+	}
+
+	return nil
+}
+
+func (b *Bot) validateURL(text string) error {
+	_, err := url.ParseRequestURI(text)
 	return err
 }

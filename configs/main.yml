@@ -4,13 +4,12 @@ bot_url: "https://t.me/Pokcet_bot"
 
 
 messages:
-  responses:
-    start: "access is required for authentication:\n%s"
-    already_authorized: "You are authorizat now, send me link and I save this link for you"
-    saved_successfully: "Link successfully saved"
-    unknown_command: "I don't know this command"
-  errors:
-    default: "unknown error happend"
-    invalid_url: "This is not valid link"
-    unauthorized: "You are not authorized! Use command /start"
-    unable_to_save: "Sorry something wrong, try letter"
+  response:
+    start: "Привет! Чтобы сохранять ссылки в своем Pocket аккаунте, для начала тебе необходимо дать мне на это доступ. Для этого переходи по ссылке:\n%s"
+    already_authorized: "Ты уже авторизовался с помощью своего Pocket аккаунта. Присылай ссылку чтобы сохранить."
+    unknown_command: "Я не знаю такой команды :("
+    link_saved: "Ссылка успешно сохранена!"
+  error:
+    default: "Произошла неизвестная ошибка."
+    invalid_url:  "Это невалидная ссылка."
+    unable_to_save: "Не удалось сохранить ссылку в Pocket. Попробуйте пожалуйста позже."
