@@ -1,3 +1,4 @@
+# Dockerfile
 FROM golang:1.20-alpine3.18 AS builder
 
 COPY . /github.com/alexvlasov182/telegram-bot/
