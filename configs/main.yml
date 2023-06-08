@@ -2,7 +2,7 @@ db_file: "bot.db"
 
 bot_url: "https://t.me/Pokcet_bot"
 
-
+# New messages
 messages:
   response:
     start: "Hello! To save links in your Pocket account, first, you need to give me access to it. To do this follow the link:\n%s"
