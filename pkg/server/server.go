@@ -6,10 +6,11 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/alexvlasov182/telegram-bot/pkg/storage"
 	"github.com/pkg/errors"
 	"github.com/zhashkevych/go-pocket-sdk"
 	"go.uber.org/zap"
+
+	"github.com/alexvlasov182/telegram-bot/pkg/storage"
 )
 
 type AuthServer struct {
@@ -22,7 +23,11 @@ type AuthServer struct {
 	redirectUrl string
 }
 
-func NewAuthServer(redirectUrl string, storage storage.TokenStorage, client *pocket.Client) *AuthServer {
+func NewAuthServer(
+	redirectUrl string,
+	storage storage.TokenStorage,
+	client *pocket.Client,
+) *AuthServer {
 	return &AuthServer{
 		redirectUrl: redirectUrl,
 		storage:     storage,
